@@ -14,7 +14,7 @@ public interface CampanhaRepository extends CrudRepository<Campanha, Integer> {
     List<Campanha> findByDataFim(Date dataFim);
 
     @Query("SELECT c FROM Campanha c WHERE c.diasProrrogracaoVigencia != 0 " +
-            "AND :dataAtual BETWEEN c.dataInicio AND c.dataFim")
+            "AND c.dataFim >= :dataAtual")
     List<Campanha> findCampanhaComVigenciaProrrogada(@Param("dataAtual") Date dataAtual);
 
     @Query("SELECT c FROM Campanha c join c.time t WHERE t.id = :idTime " +

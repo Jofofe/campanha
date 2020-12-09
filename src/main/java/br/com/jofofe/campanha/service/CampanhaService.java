@@ -2,7 +2,6 @@ package br.com.jofofe.campanha.service;
 
 import br.com.jofofe.campanha.dto.CampanhaConsultaDTO;
 import br.com.jofofe.campanha.entidades.Campanha;
-import br.com.jofofe.campanha.entidades.Time;
 import br.com.jofofe.campanha.exception.CampanhaComVigenciaVencidaException;
 import br.com.jofofe.campanha.exception.CampanhaNaoEncontradaException;
 import br.com.jofofe.campanha.exception.TimeNaoEncontradoException;
@@ -36,7 +35,7 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
         List<Campanha> campanhasMesmaVigencia = null;
         List<Campanha> campanhasAlteradas = new ArrayList<>();
         Date dataFimAtual = campanha.getDataFim();
-        equipararTimeEnviadoRequisicao(campanha);
+        validarTimeInformado(campanha);
         do {
             campanhasMesmaVigencia = repository.findByDataFim(dataFimAtual);
             dataFimAtual = Utils.adicionaQuantidadeDiasData(dataFimAtual, 1);
@@ -45,10 +44,9 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
         salvarCampanhas(campanha, campanhasAlteradas);
     }
 
-    private void equipararTimeEnviadoRequisicao(Campanha campanha) {
-        Time time = timeRepository.findById(campanha.getTime().getId())
+    private void validarTimeInformado(Campanha campanha) {
+        timeRepository.findByIdAndNomeTime(campanha.getTime().getId(), campanha.getTime().getNomeTime())
                 .orElseThrow(TimeNaoEncontradoException::new);
-        campanha.setTime(time);
     }
 
     private void aumentarDataVigenciaCampanhas(List<Campanha> campanhasMesmaVigencia, List<Campanha> campanhasAlteradas, Date dataFimAtual) {
@@ -81,7 +79,7 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
 
     private void verificaVigenciaCampanha(Campanha campanha) {
         Date dataAtual = new Date();
-        if(campanha.getDataInicio().before(dataAtual) || campanha.getDataFim().after(dataAtual)) {
+        if(campanha.getDataFim().compareTo(dataAtual) < 0) {
             throw new CampanhaComVigenciaVencidaException();
         }
     }
@@ -103,15 +101,11 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
 
     @Transactional
     public void alterarCampanha(Campanha campanha) {
-        equipararInformacoesCampanha(campanha);
-        repository.save(campanha);
-    }
-
-    private void equipararInformacoesCampanha(Campanha campanha) {
-        equipararTimeEnviadoRequisicao(campanha);
+        validarTimeInformado(campanha);
         Campanha campanhaOriginal = repository.findById(campanha.getId())
                 .orElseThrow(CampanhaNaoEncontradaException::new);
         campanha.setDiasProrrogracaoVigencia(campanhaOriginal.getDiasProrrogracaoVigencia());
+        repository.save(campanha);
     }
 
     @Transactional
