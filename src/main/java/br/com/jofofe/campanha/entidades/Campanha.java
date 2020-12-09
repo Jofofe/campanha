@@ -33,7 +33,7 @@ public class Campanha extends BaseEntidade {
     @Column(name = "DATAFIM", nullable = false)
     private Date dataFim;
 
-    @Column(name = "DIASVIGENCIAPRORROGADA", columnDefinition = "int default 0")
+    @Column(name = "DIASVIGENCIAPRORROGADA", columnDefinition = "integer default 0", insertable = false)
     private Integer diasProrrogracaoVigencia;
 
 }

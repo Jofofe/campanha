@@ -39,7 +39,7 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
         equipararTimeEnviadoRequisicao(campanha);
         do {
             campanhasMesmaVigencia = repository.findByDataFim(dataFimAtual);
-            dataFimAtual = Utils.adicionaQuantidadeDiasData(campanha.getDataFim(), 1);
+            dataFimAtual = Utils.adicionaQuantidadeDiasData(dataFimAtual, 1);
             aumentarDataVigenciaCampanhas(campanhasMesmaVigencia, campanhasAlteradas, dataFimAtual);
         } while (nonNull(campanhasMesmaVigencia) && !campanhasMesmaVigencia.isEmpty());
         salvarCampanhas(campanha, campanhasAlteradas);
@@ -53,9 +53,15 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
 
     private void aumentarDataVigenciaCampanhas(List<Campanha> campanhasMesmaVigencia, List<Campanha> campanhasAlteradas, Date dataFimAtual) {
         for(Campanha campanhaMesmaVigencia : campanhasMesmaVigencia) {
-            campanhaMesmaVigencia.setDataFim(dataFimAtual);
-            campanhaMesmaVigencia.setDiasProrrogracaoVigencia(campanhaMesmaVigencia.getDiasProrrogracaoVigencia()+1);
-            campanhasAlteradas.add(campanhaMesmaVigencia);
+            campanhasAlteradas.add(Campanha.builder()
+                    .id(campanhaMesmaVigencia.getId())
+                    .nomeCampanha(campanhaMesmaVigencia.getNomeCampanha())
+                    .time(campanhaMesmaVigencia.getTime())
+                    .dataInicio(campanhaMesmaVigencia.getDataInicio())
+                    .dataFim(dataFimAtual)
+                    .diasProrrogracaoVigencia(campanhaMesmaVigencia.getDiasProrrogracaoVigencia()+1)
+                    .build()
+            );
         }
     }
 
