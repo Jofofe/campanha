@@ -20,6 +20,8 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CampanhaDTO extends BaseDTO {
 
+    private Integer id;
+
     @NotBlank(message = "{nomeCampanha.not.blank}")
     private String nomeCampanha;
 

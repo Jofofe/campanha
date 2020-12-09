@@ -2,6 +2,7 @@ package br.com.jofofe.campanha.service;
 
 import br.com.jofofe.campanha.dto.CampanhaConsultaDTO;
 import br.com.jofofe.campanha.entidades.Campanha;
+import br.com.jofofe.campanha.entidades.Time;
 import br.com.jofofe.campanha.exception.CampanhaComVigenciaVencidaException;
 import br.com.jofofe.campanha.exception.CampanhaNaoEncontradaException;
 import br.com.jofofe.campanha.exception.TimeNaoEncontradoException;
@@ -35,13 +36,19 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
         List<Campanha> campanhasMesmaVigencia = null;
         List<Campanha> campanhasAlteradas = new ArrayList<>();
         Date dataFimAtual = campanha.getDataFim();
-        timeRepository.findById(campanha.getTime().getId()).orElseThrow(TimeNaoEncontradoException::new);
+        equipararTimeEnviadoRequisicao(campanha);
         do {
             campanhasMesmaVigencia = repository.findByDataFim(dataFimAtual);
             dataFimAtual = Utils.adicionaQuantidadeDiasData(campanha.getDataFim(), 1);
             aumentarDataVigenciaCampanhas(campanhasMesmaVigencia, campanhasAlteradas, dataFimAtual);
         } while (nonNull(campanhasMesmaVigencia) && !campanhasMesmaVigencia.isEmpty());
         salvarCampanhas(campanha, campanhasAlteradas);
+    }
+
+    private void equipararTimeEnviadoRequisicao(Campanha campanha) {
+        Time time = timeRepository.findById(campanha.getTime().getId())
+                .orElseThrow(TimeNaoEncontradoException::new);
+        campanha.setTime(time);
     }
 
     private void aumentarDataVigenciaCampanhas(List<Campanha> campanhasMesmaVigencia, List<Campanha> campanhasAlteradas, Date dataFimAtual) {
@@ -85,16 +92,20 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
     @Transactional
     public List<CampanhaConsultaDTO> buscarCampanhasComDataVigenciaProrrogada() {
         List<Campanha> campanhas = repository.findCampanhaComVigenciaProrrogada(new Date());
-        return campanhas.stream().map(c -> montaCampanhaConsulta(c)).collect(Collectors.toList());
+        return campanhas.stream().map(this::montaCampanhaConsulta).collect(Collectors.toList());
     }
 
     @Transactional
     public void alterarCampanha(Campanha campanha) {
-        if(repository.findById(campanha.getId()).isPresent()) {
-            repository.save(campanha);
-        } else {
-            throw new CampanhaNaoEncontradaException();
-        }
+        equipararInformacoesCampanha(campanha);
+        repository.save(campanha);
+    }
+
+    private void equipararInformacoesCampanha(Campanha campanha) {
+        equipararTimeEnviadoRequisicao(campanha);
+        Campanha campanhaOriginal = repository.findById(campanha.getId())
+                .orElseThrow(CampanhaNaoEncontradaException::new);
+        campanha.setDiasProrrogracaoVigencia(campanhaOriginal.getDiasProrrogracaoVigencia());
     }
 
     @Transactional

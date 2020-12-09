@@ -23,8 +23,4 @@ public class Time extends BaseEntidade {
     @Column(name = "NOMETIME", nullable = false)
     private String nomeTime;
 
-    @OneToMany(mappedBy = "time", fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
-    private Collection<Campanha> campanhas;
-
 }
