@@ -4,6 +4,7 @@ import br.com.jofofe.campanha.dto.CampanhaConsultaDTO;
 import br.com.jofofe.campanha.entidades.Campanha;
 import br.com.jofofe.campanha.exception.CampanhaComVigenciaVencidaException;
 import br.com.jofofe.campanha.exception.CampanhaNaoEncontradaException;
+import br.com.jofofe.campanha.exception.CampanhaSemIdentificadorException;
 import br.com.jofofe.campanha.exception.TimeNaoEncontradoException;
 import br.com.jofofe.campanha.repository.CampanhaRepository;
 import br.com.jofofe.campanha.repository.TimeRepository;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
@@ -101,11 +103,18 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
 
     @Transactional
     public void alterarCampanha(Campanha campanha) {
+        validaRequisicaoCampanha(campanha);
+        repository.save(campanha);
+    }
+
+    private void validaRequisicaoCampanha(Campanha campanha) {
         validarTimeInformado(campanha);
+        if(isNull(campanha.getId())) {
+            throw new CampanhaSemIdentificadorException();
+        }
         Campanha campanhaOriginal = repository.findById(campanha.getId())
                 .orElseThrow(CampanhaNaoEncontradaException::new);
         campanha.setDiasProrrogracaoVigencia(campanhaOriginal.getDiasProrrogracaoVigencia());
-        repository.save(campanha);
     }
 
     @Transactional

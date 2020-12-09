@@ -1,9 +1,6 @@
 package br.com.jofofe.campanha.exception.handler;
 
-import br.com.jofofe.campanha.exception.CampanhaComVigenciaVencidaException;
-import br.com.jofofe.campanha.exception.CampanhaExistenteException;
-import br.com.jofofe.campanha.exception.CampanhaNaoEncontradaException;
-import br.com.jofofe.campanha.exception.TimeNaoEncontradoException;
+import br.com.jofofe.campanha.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +16,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {CampanhaNaoEncontradaException.class})
     public ResponseEntity campanhaNaoEncontrada(CampanhaNaoEncontradaException ex, WebRequest request) {
         log.debug("manipulação de CampanhaNaoEncontradaException...");
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {CampanhaSemIdentificadorException.class})
+    public ResponseEntity campanhaSemIdentificador(CampanhaSemIdentificadorException ex, WebRequest request) {
+        log.debug("manipulação de CampanhaSemIdentificadorException...");
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
