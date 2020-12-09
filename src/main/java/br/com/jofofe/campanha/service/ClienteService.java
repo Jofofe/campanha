@@ -3,8 +3,10 @@ package br.com.jofofe.campanha.service;
 import br.com.jofofe.campanha.entidades.Campanha;
 import br.com.jofofe.campanha.entidades.Cliente;
 import br.com.jofofe.campanha.exception.ClienteJaCadastradoException;
+import br.com.jofofe.campanha.exception.TimeNaoEncontradoException;
 import br.com.jofofe.campanha.repository.CampanhaRepository;
 import br.com.jofofe.campanha.repository.ClienteRepository;
+import br.com.jofofe.campanha.repository.TimeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +26,18 @@ public class ClienteService extends AbstractService<Cliente, Integer, ClienteRep
 
     private final CampanhaRepository campanhaRepository;
 
-    ClienteService(ClienteRepository repository, CampanhaRepository campanhaRepository) {
+    private final TimeRepository timeRepository;
+
+
+    ClienteService(ClienteRepository repository, CampanhaRepository campanhaRepository, TimeRepository timeRepository) {
         super(repository);
         this.campanhaRepository = campanhaRepository;
+        this.timeRepository = timeRepository;
     }
 
     public List<Campanha> incluirCliente(Cliente cliente) {
         Optional<Cliente> clienteBusca = repository.findByEmail(cliente.getEmail());
+        validarTimeInformado(cliente);
         List<Campanha> campanhas = null;
         Date dataAtual = new Date();
         if(!clienteBusca.isPresent()) {
@@ -39,6 +46,11 @@ public class ClienteService extends AbstractService<Cliente, Integer, ClienteRep
             campanhas = fluxoDemaisAssociacoes(clienteBusca.get(), dataAtual);
         }
         return campanhas;
+    }
+
+    private void validarTimeInformado(Cliente cliente) {
+        timeRepository.findByIdAndNomeTime(cliente.getTime().getId(), cliente.getTime().getNomeTime())
+                .orElseThrow(TimeNaoEncontradoException::new);
     }
 
     private List<Campanha> fluxoPrimeiraAssociacao(Cliente cliente, Date dataAtual) {
