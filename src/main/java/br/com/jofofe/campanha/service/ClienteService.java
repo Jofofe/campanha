@@ -37,7 +37,6 @@ public class ClienteService extends AbstractService<Cliente, Integer, ClienteRep
 
     public List<Campanha> incluirCliente(Cliente cliente) {
         Optional<Cliente> clienteBusca = repository.findByEmail(cliente.getEmail());
-        validarTimeInformado(cliente);
         List<Campanha> campanhas = null;
         Date dataAtual = new Date();
         if(!clienteBusca.isPresent()) {
@@ -54,6 +53,7 @@ public class ClienteService extends AbstractService<Cliente, Integer, ClienteRep
     }
 
     private List<Campanha> fluxoPrimeiraAssociacao(Cliente cliente, Date dataAtual) {
+        validarTimeInformado(cliente);
         cliente.setCampanhas(campanhaRepository.findTimePorId(cliente.getTime().getId(), dataAtual));
         repository.save(cliente);
         return cliente.getCampanhas();
