@@ -11,11 +11,17 @@ import java.util.Optional;
 
 public interface CampanhaRepository extends CrudRepository<Campanha, Integer> {
 
-    List<Campanha> findByDataInicioDataFim(Date dataInicio, Date dataFim);
-
     List<Campanha> findByDataFim(Date dataFim);
 
     @Query("SELECT c FROM Campanha c WHERE c.diasProrrogracaoVigencia != 0 " +
             "AND :dataAtual BETWEEN c.dataInicio AND c.dataFim")
     List<Campanha> findCampanhaComVigenciaProrrogada(@Param("dataAtual") Date dataAtual);
+
+    @Query("SELECT c FROM Campanha c join c.time t WHERE t.id = :idTime " +
+            "AND :dataAtual BETWEEN c.dataInicio AND c.dataFim")
+    List<Campanha> findTimePorId(@Param("idTime") Integer idTime, Date dataAtual);
+
+    @Query("SELECT c FROM Campanha c WHERE c.id not in (:campanhas) " +
+            "AND :dataAtual BETWEEN c.dataInicio AND c.dataFim")
+    List<Campanha> findCampanhasNaoAtribuidas(@Param("campanhas") List<Integer> campanhas, Date dataAtual);
 }
