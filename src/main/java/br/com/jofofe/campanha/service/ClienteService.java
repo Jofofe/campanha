@@ -8,13 +8,14 @@ import br.com.jofofe.campanha.repository.ClienteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 
 
 @Slf4j
@@ -30,26 +31,38 @@ public class ClienteService extends AbstractService<Cliente, Integer, ClienteRep
 
     public List<Campanha> incluirCliente(Cliente cliente) {
         Optional<Cliente> clienteBusca = repository.findByEmail(cliente.getEmail());
-        equipararClienteEnviadoRequisicao(cliente, clienteBusca);
-        Date dataAtual = new Date();
         List<Campanha> campanhas = null;
+        Date dataAtual = new Date();
         if(!clienteBusca.isPresent()) {
-            campanhas = campanhaRepository.findTimePorId(cliente.getTime().getId(), dataAtual);
-            cliente.setCampanhas(new ArrayList<>());
+            campanhas = fluxoPrimeiraAssociacao(cliente, dataAtual);
         } else {
-            campanhas = campanhaRepository.findCampanhasNaoAtribuidas(clienteBusca.get().getCampanhas().stream()
-                    .map(Campanha::getId).collect(Collectors.toList()), dataAtual);
-            if (isNull(campanhas) || campanhas.isEmpty()) {
-                throw new ClienteJaCadastradoException();
-            }
+            campanhas = fluxoDemaisAssociacoes(clienteBusca.get(), dataAtual);
         }
-        cliente.getCampanhas().addAll(campanhas);
-        repository.save(cliente);
         return campanhas;
     }
 
-    private void equipararClienteEnviadoRequisicao(Cliente cliente, Optional<Cliente> clienteBusca) {
-        cliente.setCampanhas(clienteBusca.get().getCampanhas());
+    private List<Campanha> fluxoPrimeiraAssociacao(Cliente cliente, Date dataAtual) {
+        cliente.setCampanhas(campanhaRepository.findTimePorId(cliente.getTime().getId(), dataAtual));
+        repository.save(cliente);
+        return cliente.getCampanhas();
+    }
+
+    private List<Campanha> fluxoDemaisAssociacoes(Cliente clienteBusca, Date dataAtual) {
+        List<Campanha> campanhasNovas = null;
+        if(nonNull(clienteBusca.getCampanhas()) && !clienteBusca.getCampanhas().isEmpty()) {
+            campanhasNovas = campanhaRepository.findCampanhasNaoAtribuidas(
+                    clienteBusca.getCampanhas().stream().map(Campanha::getId)
+                            .collect(Collectors.toList()), dataAtual);
+            if (isNull(campanhasNovas) || campanhasNovas.isEmpty()) {
+                throw new ClienteJaCadastradoException();
+            }
+            clienteBusca.getCampanhas().addAll(campanhasNovas);
+        } else {
+            campanhasNovas = campanhaRepository.findTimePorId(clienteBusca.getTime().getId(), dataAtual);
+            clienteBusca.setCampanhas(campanhasNovas);
+        }
+        repository.save(clienteBusca);
+        return campanhasNovas;
     }
 
 }

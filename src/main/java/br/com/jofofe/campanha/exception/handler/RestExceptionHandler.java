@@ -48,6 +48,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {ClienteJaCadastradoException.class})
+    public ResponseEntity clienteJaCadastrado(ClienteJaCadastradoException ex, WebRequest request) {
+        log.debug("manipulação de ClienteJaCadastradoException...");
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected ResponseEntity handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.debug("manipulação de MethodArgumentNotValidException...");
