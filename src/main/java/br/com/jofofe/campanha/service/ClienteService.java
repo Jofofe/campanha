@@ -68,11 +68,10 @@ public class ClienteService extends AbstractService<Cliente, Integer, ClienteRep
             if (isNull(campanhasNovas) || campanhasNovas.isEmpty()) {
                 throw new ClienteJaCadastradoException();
             }
-            clienteBusca.getCampanhas().addAll(campanhasNovas);
         } else {
             campanhasNovas = campanhaRepository.findTimePorId(clienteBusca.getTime().getId(), dataAtual);
-            clienteBusca.setCampanhas(campanhasNovas);
         }
+        clienteBusca.addCampanhas(campanhasNovas);
         repository.save(clienteBusca);
         return campanhasNovas;
     }
