@@ -66,8 +66,10 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
     }
 
     private void salvarCampanhas(Campanha campanha, List<Campanha> campanhasAlteradas) {
-        for(Campanha campanhaAlterada : campanhasAlteradas) {
-            repository.save(campanhaAlterada);
+        if(nonNull(campanhasAlteradas) && !campanhasAlteradas.isEmpty()) {
+            for(Campanha campanhaAlterada : campanhasAlteradas) {
+                repository.save(campanhaAlterada);
+            }
         }
         repository.save(campanha);
     }

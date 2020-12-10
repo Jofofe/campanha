@@ -56,7 +56,7 @@ public class Cliente extends BaseEntidade {
     }
 
     public void addCampanhas(List<Campanha> campanhas) {
-        if(nonNull(campanhas) || !campanhas.isEmpty()) {
+        if(nonNull(campanhas) && !campanhas.isEmpty()) {
             if(isNull(this.campanhas)) {
                 this.campanhas = new ArrayList<>();
             }
