@@ -35,7 +35,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {CampanhaComIdentificadorException.class})
     public ResponseEntity campanhaComIdentificador(CampanhaComIdentificadorException ex, WebRequest request) {
         log.debug("manipulação de CampanhaComIdentificadorException...");
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {CampanhaExistenteException.class})

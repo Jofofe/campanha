@@ -34,7 +34,8 @@ public class CampanhaController {
     @ApiOperation(value = "Incluir campanha")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Campanha salva com sucesso", response = Object.class),
-            @ApiResponse(code = 400, message = "Campanha já existente"),
+            @ApiResponse(code = 404, message = "Alguma informação não foi encontrada"),
+            @ApiResponse(code = 400, message = "Ooorreu algum erro negocial"),
             @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
     })
     public ResponseEntity incluirCampanha(@Valid @RequestBody CampanhaDTO campanha) {
@@ -46,7 +47,8 @@ public class CampanhaController {
     @ApiOperation(value = "Buscar campanha", response = CampanhaConsultaDTO.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Campanha retornada"),
-            @ApiResponse(code = 404, message = "Alguma informação não foi encontrada"),
+            @ApiResponse(code = 404, message = "Campanha não encontrada"),
+            @ApiResponse(code = 400, message = "Ooorreu algum erro negocial"),
             @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
     })
     public ResponseEntity buscarCampanha(@PathVariable("idCampanha") Integer idCampanha) {

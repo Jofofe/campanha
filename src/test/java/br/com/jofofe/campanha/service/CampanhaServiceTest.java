@@ -40,7 +40,7 @@ public class CampanhaServiceTest {
     public void testarIncluiCampanha() {
         Mockito.when(timeRepository.findByIdAndNomeTime(anyInt(), anyString())).thenReturn(Optional.of(criarTime()));
         Mockito.when(repository.findByDataFim(any())).thenReturn(new ArrayList<>());
-        campanhaService.incluirCampanha(criarCampanha());
+        campanhaService.incluirCampanha(criarCampanhaSemIdentificados());
         verify(repository, atLeastOnce()).save(any(Campanha.class));
     }
 

@@ -36,7 +36,8 @@ public class ClienteController {
     @ApiOperation(value = "Incluir cliente")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Cliente salvo com sucesso", response = Object.class),
-            @ApiResponse(code = 400, message = "Cliente já existente"),
+            @ApiResponse(code = 404, message = "Alguma informação não foi encontrada"),
+            @ApiResponse(code = 400, message = "Ooorreu algum erro negocial"),
             @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
     })
     public ResponseEntity incluirCliente(@Valid @RequestBody ClienteDTO cliente) {
