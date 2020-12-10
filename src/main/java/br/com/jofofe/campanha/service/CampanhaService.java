@@ -2,10 +2,7 @@ package br.com.jofofe.campanha.service;
 
 import br.com.jofofe.campanha.dto.CampanhaConsultaDTO;
 import br.com.jofofe.campanha.entidades.Campanha;
-import br.com.jofofe.campanha.exception.CampanhaComVigenciaVencidaException;
-import br.com.jofofe.campanha.exception.CampanhaNaoEncontradaException;
-import br.com.jofofe.campanha.exception.CampanhaSemIdentificadorException;
-import br.com.jofofe.campanha.exception.TimeNaoEncontradoException;
+import br.com.jofofe.campanha.exception.*;
 import br.com.jofofe.campanha.repository.CampanhaRepository;
 import br.com.jofofe.campanha.repository.TimeRepository;
 import br.com.jofofe.campanha.util.Utils;
@@ -37,13 +34,20 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
         List<Campanha> campanhasMesmaVigencia = null;
         List<Campanha> campanhasAlteradas = new ArrayList<>();
         Date dataFimAtual = campanha.getDataFim();
-        validarTimeInformado(campanha);
+        validarInclusaoCampanha(campanha);
         do {
             campanhasMesmaVigencia = repository.findByDataFim(dataFimAtual);
             dataFimAtual = Utils.adicionaQuantidadeDiasData(dataFimAtual, 1);
             aumentarDataVigenciaCampanhas(campanhasMesmaVigencia, campanhasAlteradas, dataFimAtual);
         } while (nonNull(campanhasMesmaVigencia) && !campanhasMesmaVigencia.isEmpty());
         salvarCampanhas(campanha, campanhasAlteradas);
+    }
+
+    private void validarInclusaoCampanha(Campanha campanha) {
+        validarTimeInformado(campanha);
+        if(nonNull(campanha.getId())) {
+            throw new CampanhaComIdentificadorException();
+        }
     }
 
     private void validarTimeInformado(Campanha campanha) {
@@ -105,11 +109,11 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
 
     @Transactional
     public void alterarCampanha(Campanha campanha) {
-        validaRequisicaoCampanha(campanha);
+        validaAlteracaoCampanha(campanha);
         repository.save(campanha);
     }
 
-    private void validaRequisicaoCampanha(Campanha campanha) {
+    private void validaAlteracaoCampanha(Campanha campanha) {
         validarTimeInformado(campanha);
         if(isNull(campanha.getId())) {
             throw new CampanhaSemIdentificadorException();

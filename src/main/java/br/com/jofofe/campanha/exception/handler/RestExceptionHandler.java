@@ -1,10 +1,12 @@
 package br.com.jofofe.campanha.exception.handler;
 
 import br.com.jofofe.campanha.exception.*;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -27,6 +29,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {CampanhaSemIdentificadorException.class})
     public ResponseEntity campanhaSemIdentificador(CampanhaSemIdentificadorException ex, WebRequest request) {
         log.debug("manipulação de CampanhaSemIdentificadorException...");
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {CampanhaComIdentificadorException.class})
+    public ResponseEntity campanhaComIdentificador(CampanhaComIdentificadorException ex, WebRequest request) {
+        log.debug("manipulação de CampanhaComIdentificadorException...");
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
