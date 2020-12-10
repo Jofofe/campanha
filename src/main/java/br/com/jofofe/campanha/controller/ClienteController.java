@@ -1,11 +1,9 @@
 package br.com.jofofe.campanha.controller;
 
-import br.com.jofofe.campanha.dto.CampanhaDTO;
 import br.com.jofofe.campanha.dto.ClienteDTO;
 import br.com.jofofe.campanha.entidades.Campanha;
 import br.com.jofofe.campanha.entidades.Cliente;
 import br.com.jofofe.campanha.mapper.ObjectMapper;
-import br.com.jofofe.campanha.service.CampanhaService;
 import br.com.jofofe.campanha.service.ClienteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
