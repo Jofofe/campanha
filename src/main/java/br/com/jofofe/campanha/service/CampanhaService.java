@@ -31,10 +31,14 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
 
     @Transactional
     public void incluirCampanha(Campanha campanha) {
+        validarInclusaoCampanha(campanha);
+        fluxoImpedimentoCampanhasMesmaDataVigencia(campanha);
+    }
+
+    private void fluxoImpedimentoCampanhasMesmaDataVigencia(Campanha campanha) {
         List<Campanha> campanhasMesmaVigencia = null;
         List<Campanha> campanhasAlteradas = new ArrayList<>();
         Date dataFimAtual = campanha.getDataFim();
-        validarInclusaoCampanha(campanha);
         do {
             campanhasMesmaVigencia = repository.findByDataFim(dataFimAtual);
             dataFimAtual = Utils.adicionaQuantidadeDiasData(dataFimAtual, 1);
@@ -110,7 +114,7 @@ public class CampanhaService extends AbstractService<Campanha, Integer, Campanha
     @Transactional
     public void alterarCampanha(Campanha campanha) {
         validaAlteracaoCampanha(campanha);
-        repository.save(campanha);
+        fluxoImpedimentoCampanhasMesmaDataVigencia(campanha);
     }
 
     private void validaAlteracaoCampanha(Campanha campanha) {
