@@ -1,0 +1,17 @@
+Arquitetura Utilizada
+
+Foi utilizado o Spring Boot com suas dependências de data-jpa e web
+
+Seguindo a arquitetura basica Controller - Service - Repository
+
+Na entrada das requisições no backend são utilizadas o Bean Validation
+
+Para todas as excessões criadas do projeto, são utilizadas um handler 
+para a resposta da mesma na requsisição
+
+Foi criado um loader para inclusão de times, auxiliando nos testes
+
+O JPA esta configurado como CREATE, para sempre deletar e criar novamente as estruturas,
+gerando testes mais limpos
+
+Para testes unitarios foi utilizado JUnit, Mockito, Asserts e MockMvc
